@@ -8,10 +8,19 @@ app.set('view engine', 'ejs')
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 
-const rooms = {}
+const rooms = {name: {}}
 
 app.get('/', (req, res) => {
   res.render('index', {rooms: rooms})
+})
+
+app.post('/room', (res, req) => {
+  if (rooms[req.body.room] != null) {
+    return res.redirect('/')
+  }
+  rooms[req.body.room] = { users: {} }
+  res.redirect(req.body.room)
+  // Send message that new room was created
 })
 
 app.get('/:room', (req, res) => {
