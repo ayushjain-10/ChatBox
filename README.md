@@ -4,7 +4,6 @@
 A simple chat application built in [Node.js](https://nodejs.org) using [Express](http://expressjs.com/) and [Socket.IO](https://socket.io/).
 
 Installation
-===
 
 #### 1. Clone the Repository
 
