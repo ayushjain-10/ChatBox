@@ -1,5 +1,4 @@
 # ChatBox
-===
 
 A simple chat application built in [Node.js](https://nodejs.org) using [Express](http://expressjs.com/) and [Socket.IO](https://socket.io/).
 
