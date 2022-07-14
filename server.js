@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
+const serverless = require('serverless-http');
 
 app.set('views', './views')
 app.set('view engine', 'ejs')
@@ -37,10 +38,11 @@ io.on('connection', socket => {
   socket.on('new-user', (room, name) => {
     socket.join(room)
     rooms[room].users[socket.id] = name
-    socket.to(room).broadcast.emit('user-connected', name)
+    console.log(socket.to(room))
+    socket.to(room).emit('user-connected', name)
   })
   socket.on('send-chat-message', (room, message) => {
-    socket.to(room).broadcast.emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
+    socket.to(room).emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
   })
   socket.on('disconnect', () => {
     getUserRooms(socket).forEach(room => {
@@ -56,3 +58,5 @@ function getUserRooms(socket) {
     return names
   }, [])
 }
+
+module.exports.handler = serverless(app);
