@@ -4,6 +4,9 @@ const server = require('http').Server(app)
 const io = require('socket.io')(server)
 const serverless = require('serverless-http');
 
+const path = require('path');
+app.set('views', path.join(__dirname, './views'));
+
 app.set('views', './views')
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
