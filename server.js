@@ -9,7 +9,7 @@ app.set('view engine', 'ejs')
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 
-const rooms = { }
+const rooms = {}
 
 app.get('/', (req, res) => {
   res.render('index', { rooms: rooms })
@@ -34,17 +34,32 @@ app.get('/:room', (req, res) => {
 
 io.on('connection', socket => {
   socket.on('new-user', (room, name) => {
+    // Check if the room exists
+    if (!rooms[room]) {
+      console.error(`Room ${room} does not exist`);
+      return;
+    }
+
     socket.join(room)
     rooms[room].users[socket.id] = name
     socket.to(room).emit('user-connected', name)
   })
+
   socket.on('send-chat-message', (room, message) => {
+    if (!rooms[room]) {
+      console.error(`Room ${room} does not exist`);
+      return;
+    }
+
     socket.to(room).emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
   })
+
   socket.on('disconnect', () => {
     getUserRooms(socket).forEach(room => {
-      socket.to(room).broadcast.emit('user-disconnected', rooms[room].users[socket.id])
-      delete rooms[room].users[socket.id]
+      if (rooms[room] && rooms[room].users[socket.id]) {
+        io.to(room).emit('user-disconnected', rooms[room].users[socket.id]);
+        delete rooms[room].users[socket.id]
+      }
     })
   })
 })
