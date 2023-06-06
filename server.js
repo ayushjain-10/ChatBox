@@ -1,13 +1,10 @@
 const express = require('express')
 const app = express()
-const server = require('http').Server(app)
+const server = require('http').createServer(app)
 const io = require('socket.io')(server)
-const serverless = require('serverless-http');
-
 const path = require('path');
-app.set('views', path.join(__dirname, './views'));
 
-app.set('views', './views')
+app.set('views', path.join(__dirname, './views'));
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
@@ -35,13 +32,10 @@ app.get('/:room', (req, res) => {
   res.render('room', { roomName: req.params.room })
 })
 
-server.listen(3000)
-
 io.on('connection', socket => {
   socket.on('new-user', (room, name) => {
     socket.join(room)
     rooms[room].users[socket.id] = name
-    console.log(socket.to(room))
     socket.to(room).emit('user-connected', name)
   })
   socket.on('send-chat-message', (room, message) => {
@@ -66,5 +60,3 @@ const port = process.env.PORT || 3000;
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
-module.exports.handler = serverless(app);
